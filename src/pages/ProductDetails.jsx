@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 
 import { CartContext } from "../context/CartContext";
@@ -25,17 +24,27 @@ function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState(0);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/products/${id}`)
-      .then((res) => {
-        setProduct(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-  }, [id]);
+
+  fetch("https://myshop-backend-pj92.onrender.com/api/products")
+    .then((res) => res.json())
+    .then((data) => {
+
+      const singleProduct = data.find(
+        (item) => item._id === id
+      );
+
+      setProduct(singleProduct);
+      setLoading(false);
+
+    })
+    .catch((err) => {
+
+      console.log(err);
+      setLoading(false);
+
+    });
+
+}, [id]);
 
   if (loading) {
     return (
