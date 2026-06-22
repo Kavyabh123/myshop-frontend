@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
@@ -8,8 +7,7 @@ function Home() {
   const [backendProducts, setBackendProducts] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/products")
+    fetch("https://myshop-backend.onrender.com/api/products")
       .then((res) => {
         setBackendProducts(res.data);
       })
