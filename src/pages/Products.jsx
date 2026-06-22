@@ -1,38 +1,71 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+
 import Navbar from "../components/Navbar";
-import SearchBar from "../components/SearchBar";
+import ProductGrid from "../components/ProductGrid";
 import Footer from "../components/Footer";
-import products from "../data/products";
 
 function Products() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(
+    location.search
+  );
+
+  const selectedCategory =
+    queryParams.get("category");
+
+  useEffect(() => {
+    axios
+      .get(
+        "http://localhost:5000/api/products"
+      )
+      .then((res) => {
+        setProducts(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredProducts = selectedCategory
+    ? products.filter(
+        (product) =>
+          product.category === selectedCategory
+      )
+    : products;
+   
+    console.log("API Products:", products);
+    console.log("Filtered Products:", filteredProducts);
+
   return (
     <>
       <Navbar />
 
-      <SearchBar />
+      <div className="bg-gray-100 min-h-screen">
+        <div className="max-w-7xl mx-auto py-10">
 
-      <div className="grid md:grid-cols-3 gap-6 p-8">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="border rounded-lg p-4 shadow"
-          >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-48 w-full object-cover rounded"
+          <h1 className="text-4xl font-bold text-center mb-8">
+            {selectedCategory || "All Products"}
+          </h1>
+
+          {loading ? (
+            <h2 className="text-center text-xl">
+              Loading Products...
+            </h2>
+          ) : (
+            <ProductGrid
+              products={filteredProducts}
             />
+          )}
 
-            <h3 className="font-bold mt-3">
-              {product.name}
-            </h3>
-
-            <p>₹{product.price}</p>
-
-            <button className="bg-blue-600 text-white px-4 py-2 rounded mt-3">
-              Add to Cart
-            </button>
-          </div>
-        ))}
+        </div>
       </div>
 
       <Footer />
